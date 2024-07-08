@@ -1,0 +1,212 @@
+Table Structures
+
+
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    department_id INT,
+    salary DECIMAL(10, 2),
+    hire_date DATE
+);
+
+CREATE TABLE sales (
+    sale_id INT PRIMARY KEY,
+    employee_id INT,
+    sale_date DATE,
+    amount DECIMAL(10, 2)
+);
+
+CREATE TABLE departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(100)
+);
+
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(100),
+    price DECIMAL(10, 2)
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    product_id INT,
+    order_date DATE,
+    quantity INT
+);
+
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    city VARCHAR(100)
+);
+
+Question (Write Query)
+
+Write single query for all below questions 
+ 
+Find the second highest salary in each department.
+Calculate the difference in sales between each employee's current sale and their previous sale.
+Retrieve the average salary of employees in each department and the difference of each employee's salary from the department's average salary.
+Find the cumulative percentage of total sales amount for each employee.
+Retrieve the top 3 most expensive products in each category.
+Calculate the year-to-date (YTD) sales for each employee.
+Retrieve the sales of each employee as a percentage of the total sales in their department.
+Retrieve the name and total sales amount for the employee with the second highest total sales.
+Find the average sales amount per employee for each department, including departments with no sales.
+Retrieve the names of employees who have the highest sale amount in each department.
+Identify the customers who have not placed any orders in the last 6 months.
+List customers who have placed more orders than the average number of orders per customer.
+Find the names of employees who have not sold any products in the "Electronics" category.
+
+
+
+
+
+
+
+Write a single query using below mentioned tables to fetch list of samples with parent test available under the sample and child tests available under that parent test. If not child test available under a parent then child test should be empty. Check response example. 
+
+	Tables 
+========================
+CREATE TABLE `antz_medical_tests` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `lab_test_id` text,
+  `is_additional_sample` tinyint DEFAULT '0',
+  `additional_samples` text,
+  `medical_record_id` int NOT NULL,
+  `animal_id` int unsigned NOT NULL,
+  `sample_id` int unsigned DEFAULT NULL,
+  `sample_name` varchar(100) DEFAULT NULL,
+  `test_id` int unsigned DEFAULT NULL,
+  `test_name` varchar(100) DEFAULT NULL,
+  `parent_test_id` int unsigned DEFAULT NULL,
+  `parent_test_name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `full_test` tinyint NOT NULL DEFAULT '0' COMMENT '0 = No, 1 = Yes',
+  `is_deleted` tinyint NOT NULL DEFAULT '0' COMMENT '0 = No, 1 = Yes',
+  `created_by` int NOT NULL,
+  `modified_by` int NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `lab_id` int unsigned DEFAULT NULL,
+  `site_id` int unsigned DEFAULT NULL,
+  `status` enum('pending','inprogress','completed','transferred') DEFAULT 'pending',
+  `transfer_reason` text,
+  `is_tranferred` tinyint DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `fk_antz_medical_tests_medical_record_id` (`medical_record_id`),
+  KEY `fk_antz_medical_tests_animal_id` (`animal_id`),
+  KEY `fk_antz_medical_tests_sample_id` (`sample_id`),
+  KEY `fk_antz_medical_tests_test_id` (`test_id`),
+  KEY `fk_antz_medical_tests_parent_test_id` (`parent_test_id`),
+  CONSTRAINT `fk_antz_medical_tests_animal_id` FOREIGN KEY (`animal_id`) REFERENCES `antz_animals` (`animal_id`),
+  CONSTRAINT `fk_antz_medical_tests_medical_record_id` FOREIGN KEY (`medical_record_id`) REFERENCES `antz_medical_record` (`id`),
+  CONSTRAINT `fk_antz_medical_tests_parent_test_id` FOREIGN KEY (`parent_test_id`) REFERENCES `antz_master_lab_tests` (`id`),
+  CONSTRAINT `fk_antz_medical_tests_sample_id` FOREIGN KEY (`sample_id`) REFERENCES `antz_master_samples_types` (`id`),
+  CONSTRAINT `fk_antz_medical_tests_test_id` FOREIGN KEY (`test_id`) REFERENCES `antz_master_lab_tests` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14115 DEFAULT CHARSET=utf8mb3;
+
+
+CREATE TABLE `antz_master_samples_types` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `label` varchar(100) NOT NULL,
+  `string_id` varchar(100) NOT NULL,
+  `description` text NOT NULL,
+  `zoo_id` int DEFAULT '0',
+  `active` tinyint NOT NULL DEFAULT '1',
+  `created_by` int NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_zoo_id_antz_master_samples_types` (`zoo_id`),
+  CONSTRAINT `fk_zoo_id_antz_master_samples_types` FOREIGN KEY (`zoo_id`) REFERENCES `antz_zoos` (`zoo_id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
+
+
+CREATE TABLE `antz_sample_test_mapping` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `sample_id` int unsigned NOT NULL,
+  `test_id` int unsigned DEFAULT NULL,
+  `created_by` int NOT NULL,
+  `modified_by` int NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_antz_master_samples_types_sample_id` (`sample_id`),
+  KEY `fk_antz_master_lab_tests_test_id` (`test_id`),
+  CONSTRAINT `fk_antz_master_lab_tests_test_id` FOREIGN KEY (`test_id`) REFERENCES `antz_master_lab_tests` (`id`),
+  CONSTRAINT `fk_antz_master_samples_types_sample_id` FOREIGN KEY (`sample_id`) REFERENCES `antz_master_samples_types` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=288 DEFAULT CHARSET=utf8mb3;
+
+
+
+response example: 
+
+{
+    "success": true,
+    "data": [
+        {
+            "sample_id": "1",
+            "sample_name": "Whole Blood",
+            "tests": [
+                {
+                    "test_id": 1,
+                    "test_name": "Toxicology Tests",
+                    "child_tests": [
+                        {
+                            "test_id": 2,
+                            "test_name": "Heavy Metal Testing",
+                        },
+                        {
+                            "test_id": 3,
+                            "test_name": "Drug Screening",
+                        },
+                        {
+                            "test_id": 4,
+                            "test_name": "Pesticide Residue Analysis",
+                        }
+                    ],
+                },
+                {
+                    "test_id": 19,
+                    "test_name": "Renal Function Tests",
+                    "child_tests": [
+                        {
+                            "test_id": 20,
+                            "test_name": "Glomerular Filtration Rate (GFR) Measurement",
+                        }
+                    ],
+                },
+                {
+                    "test_id": 589,
+                    "test_name": "Microbiological Tests 2",
+                    "child_tests": [],
+                },
+                {
+                    "test_id": 590,
+                    "test_name": "Microbiological Tests 1",
+                    "child_tests": [],
+                }
+            ]
+        },
+        {
+            "sample_id": "16",
+            "sample_name": "Blood spot, Egg Shells and Feathers",
+            "tests": [
+                {
+                    "test_id": 639,
+                    "test_name": "Sexing",
+                    "child_tests": [],
+                },
+                {
+                    "test_id": 640,
+                    "test_name": "Species Identification",
+                    "child_tests": [],
+                }
+            ]
+        }
+    ],
+}
+
+
+
